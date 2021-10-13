@@ -8,15 +8,19 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.Marker
 import com.example.machi_nori_system.databinding.ActivityMapsBinding
 import com.google.android.gms.maps.model.*
-import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
+import android.graphics.Bitmap
+
+import android.graphics.BitmapFactory
+
+
+
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -48,32 +52,57 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         latlng = LatLng(36.532264, 136.62770)
-        addMarker()
+        val machinori_icon = BitmapDescriptorFactory.fromResource(R.drawable.machinori)
+
+        try {
+            val data = parseJson("Machinori.json")
+            val jsonObj = data.getJSONArray("Machinori")
+            for (i in 0 until jsonObj.length()) {
+                val central = jsonObj.getJSONObject(i)
+                //                Log.d("Check", String.valueOf(central));
+                val port = Port(central)
+                //                setMarker(central_inter.location ,central_inter.lat, central_inter.lng);
+                setIcon(port.lat, port.lng)
+                googleMap.addMarker(
+                    MarkerOptions()
+                        .zIndex(10f)
+                        .position(latlng)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.machinori))
+                )
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
 
         // Add a marker in Sydney and move the camera
         val kanazawa = LatLng(36.56330, 136.65414)
         mMap.moveCamera(CameraUpdateFactory.newLatLng(kanazawa))
     }
 
+
     private fun setIcon(latitude: Double, longitude: Double) {
         latlng = LatLng(latitude, longitude)
-        val descriptor = BitmapDescriptorFactory.fromResource(R.drawable.machinori_port)
+        val descriptor = BitmapDescriptorFactory.fromResource(R.drawable.machinori)
 
         // 貼り付設定
-        val overlayOptions = GroundOverlayOptions()
-        overlayOptions.image(descriptor)
+//        val overlayOptions = GroundOverlayOptions()
+//        overlayOptions.image(descriptor)
         // 画像固定位置
-        overlayOptions.anchor(0.5f, 0.9f)
+//        overlayOptions.anchor(0.5f, 0.9f)
 
         // 張り付け画像の大きさ メートル単位
         // public GroundOverlayOptions	position(LatLng location, float width, float height)
-        overlayOptions.position(latlng, 80f, 160f)
-        overlayOptions.zIndex(10f)
+//        overlayOptions.position(latlng, 80f, 80f)
+//        overlayOptions.zIndex(10f)
 
         // マップに貼り付け・アルファを設定
-        val overlay = mMap.addGroundOverlay(overlayOptions)
-        overlay.transparency = 0.0f
-
+//        val overlay = mMap.addGroundOverlay(overlayOptions)
+//        overlay.transparency = 0.0f
+        val options = MarkerOptions()
+        options.icon(descriptor)
+        options.position(latlng)
     }
 
 
@@ -104,9 +133,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         init {
             id = json.getInt("id")
-            location = json.getString("location")
+            location = json.getString("name")
             lat = json.getDouble("lat")
-            lng = json.getDouble("lng")
+            lng = json.getDouble("lon")
         }
     }
 
