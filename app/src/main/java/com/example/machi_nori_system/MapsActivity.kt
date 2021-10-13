@@ -52,7 +52,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         latlng = LatLng(36.532264, 136.62770)
-        val machinori_icon = BitmapDescriptorFactory.fromResource(R.drawable.machinori)
 
         try {
             val data = parseJson("Machinori.json")
@@ -85,21 +84,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun setIcon(latitude: Double, longitude: Double) {
         latlng = LatLng(latitude, longitude)
         val descriptor = BitmapDescriptorFactory.fromResource(R.drawable.machinori)
-
-        // 貼り付設定
-//        val overlayOptions = GroundOverlayOptions()
-//        overlayOptions.image(descriptor)
-        // 画像固定位置
-//        overlayOptions.anchor(0.5f, 0.9f)
-
-        // 張り付け画像の大きさ メートル単位
-        // public GroundOverlayOptions	position(LatLng location, float width, float height)
-//        overlayOptions.position(latlng, 80f, 80f)
-//        overlayOptions.zIndex(10f)
-
-        // マップに貼り付け・アルファを設定
-//        val overlay = mMap.addGroundOverlay(overlayOptions)
-//        overlay.transparency = 0.0f
         val options = MarkerOptions()
         options.icon(descriptor)
         options.position(latlng)
@@ -107,23 +91,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
 
-    private fun addMarker() {
-        try {
-            val data = parseJson("Machinori.json")
-            val jsonObj = data.getJSONArray("Machinori")
-            for (i in 0 until jsonObj.length()) {
-                val central = jsonObj.getJSONObject(i)
-                //                Log.d("Check", String.valueOf(central));
-                val port = Port(central)
-                //                setMarker(central_inter.location ,central_inter.lat, central_inter.lng);
-                setIcon(port.lat, port.lng)
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
-        } catch (e: JSONException) {
-            e.printStackTrace()
-        }
-    }
 
     class Port(json: JSONObject) {
         var id: Int
