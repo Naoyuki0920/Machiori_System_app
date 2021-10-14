@@ -18,15 +18,12 @@ import java.io.InputStreamReader
 import android.graphics.Bitmap
 
 import android.graphics.BitmapFactory
-
-
-
+import android.util.Log
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
-    private var latlng: LatLng? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,57 +37,35 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
+
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        latlng = LatLng(36.532264, 136.62770)
 
         try {
             val data = parseJson("Machinori.json")
             val jsonObj = data.getJSONArray("Machinori")
+            var cnt = 0;
             for (i in 0 until jsonObj.length()) {
                 val central = jsonObj.getJSONObject(i)
-                //                Log.d("Check", String.valueOf(central));
                 val port = Port(central)
-                //                setMarker(central_inter.location ,central_inter.lat, central_inter.lng);
-                setIcon(port.lat, port.lng)
                 googleMap.addMarker(
                     MarkerOptions()
+                        .title(port.location)
                         .zIndex(10f)
-                        .position(latlng)
+                        .position(LatLng(port.lat, port.lng))
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.machinori))
                 )
+                cnt++
+                Log.d("debug", cnt.toString())
             }
         } catch (e: IOException) {
             e.printStackTrace()
         } catch (e: JSONException) {
             e.printStackTrace()
         }
-
-        // Add a marker in Sydney and move the camera
-        val kanazawa = LatLng(36.56330, 136.65414)
+        val kanazawa = LatLng(36.5757632, 136.6372995)
         mMap.moveCamera(CameraUpdateFactory.newLatLng(kanazawa))
     }
-
-
-    private fun setIcon(latitude: Double, longitude: Double) {
-        latlng = LatLng(latitude, longitude)
-        val descriptor = BitmapDescriptorFactory.fromResource(R.drawable.machinori)
-        val options = MarkerOptions()
-        options.icon(descriptor)
-        options.position(latlng)
-    }
-
-
-
 
     class Port(json: JSONObject) {
         var id: Int
@@ -102,7 +77,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             id = json.getInt("id")
             location = json.getString("name")
             lat = json.getDouble("lat")
-            lng = json.getDouble("lon")
+            lng = json.getDouble("lng")
         }
     }
 
