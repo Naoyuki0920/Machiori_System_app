@@ -15,9 +15,6 @@ import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
-import android.graphics.Bitmap
-
-import android.graphics.BitmapFactory
 import android.util.Log
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
